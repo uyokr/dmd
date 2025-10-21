@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>FLEX 스크롤 페이지</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Noto Sans KR", sans-serif;
+      color: white;
+      background-color: #000;
+    }
+    
+    section.overlay { 
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-start;
+      text-align: left;
+      padding: 80px;
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      box-sizing: border-box;
+    }
+    
+    section.overlay::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.55);
+      z-index: 1;
+    }
+    
+    section.overlay > * {
+      position: relative;
+      z-index: 2;
+    }
+
+    h1 {
+      font-size: 120px;
+      margin-bottom: 20px;
+      line-height: 1.1;
+    }
+
+    h2 {
+      font-size: 32px;
+      margin-bottom: 16px;
+    }
+
+    p {
+      font-size: 20px;
+      line-height: 1.6;
+      max-width: 400px;
+    }
+
+    .overlay.centered {
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    
+    .overlay.light-bg {
+      color: #111;
+    }
+
+    .overlay.light-bg::before {
+      background-color: rgba(255, 255, 255, 0.75);
+    }
+    
+    #page1 { background-image: url("cn1.png"); }
+    #page2 { 
+      background-image: url("cn2.png");
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center center;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    #page3 { background-image: url("cn3.webp"); background-position: top center; } 
+    #page4 { background-image: url("black.png"); }
+    #page5 { background-image: url("cn5.jpeg"); }
+    #page6 { background-image: url("cn6.png"); }
+    #page7 { background-image: url("cn7.jpeg"); }
+    #page8 { 
+      background-image: none; 
+      background-color: #e6f1f4;
+      color: #111;
+    }
+    #page8::before {
+      background-color: rgba(255, 255, 255, 0);
+    }
+    #page9 { 
+      background-image: url("cn9.png");
+      background-size: cover;
+      background-position: center top;
+      color: white;
+      justify-content: flex-start; 
+      align-items: flex-start;
+      text-align: left;
+    }
+    #page9::before {
+      background-color: rgba(0,0,0,0.4); 
+    }
+    #page10 { background-image: url("cn10.jpeg"); }
+
+    #page2 .headline-box-p2 {
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+      z-index: 3; 
+    }
+    #page2 .headline-box-p2 h2 { 
+      font-size: 1.4rem; font-weight: 400; margin: 0.5rem 0; color: #fff;
+    }
+    #page2 .headline-box-p2 h1 { 
+      font-size: 6rem; font-weight: 800; color: #7ce5f4; margin: 0.5rem 0; 
+    }
+    
+    #page2 .info-box-p2-bottom {
+      position: absolute;
+      bottom: 15%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(255,255,255,0.1); 
+      padding: 1rem 1.5rem; 
+      border-radius: 12px; 
+      max-width: 600px; 
+      color: #dcefff; 
+      font-size: 1rem;
+      line-height: 1.6;
+      text-align: center;
+      z-index: 3;
+    }
+
+    #page2::before {
+        background-color: rgba(0,0,0,0.55);
+    }
+
+    #page3 .content-wrapper { width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; }
+    #page3 .hashtag p { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; max-width: none; }
+    #page3 h1 { font-size: 4rem; font-weight: 800; color: #9ccde8; margin-bottom: 40px; }
+    #page3 .image-frame { width: 420px; height: auto; border-radius: 25px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+    #page3 img { width: 100%; height: auto; display: block; }
+    #page3 p { font-size: 1rem; line-height: 1.7; text-align: center; max-width: none; }
+
+    #page4 h1 { font-size: 3rem; font-weight: 800; margin-bottom: 10px; }
+    #page4 h2 { font-size: 1.8rem; font-weight: 600; margin-bottom: 20px; line-height: 1.4; }
+    
+    #page4 .image-frame-p4 {
+      width: 420px;
+      height: auto;
+      border-radius: 25px;
+      overflow: hidden;
+      margin-bottom: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      margin: 0 auto 25px auto;
+    }
+    #page4 .image-frame-p4 img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    #page4 .quote-box {
+      background-color: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 20px 30px;
+      max-width: 500px;
+      line-height: 1.7;
+      font-size: 1rem;
+      color: #e0e0e0;
+      margin: 0 auto;
+      text-align: center;
+    }
+    
+    #page5 h1, #page6 h1, #page7 h1 { font-size: 3rem; font-weight: 900; line-height: 1.3; margin-bottom: 40px; }
+    #page7 h1 { font-size: 5rem; font-weight: bold; margin-bottom: 30px; }
+    #page7 h1 span { color: #a0b0b8; }
+
+    #page5 {
+      justify-content: space-between;
+      align-items: flex-start;
+      text-align: left;
+    }
+    
+    #page5 h1 { 
+      font-size: 5rem;
+      font-weight: 900; 
+      line-height: 1.3; 
+      margin-top: 0;
+      margin-bottom: 0; 
+    }
+    
+    #page5 .stat-box { 
+      background-color: rgba(255,255,255,0.1); 
+      border-radius: 12px; 
+      padding: 25px 30px; 
+      font-size: 1.05rem; 
+      line-height: 1.7; 
+      color: #e5e5e5;
+      max-width: 500px; 
+      margin-bottom: 0;
+      margin-top: 0;
+    }
+    
+    #page5 .content-wrapper {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    #page6 {
+      justify-content: flex-start; 
+      align-items: flex-start;
+      text-align: left;
+    }
+    
+    #page6 .headline-box-p6 {
+      position: absolute;
+      top: 20%;
+      left: 80px;
+      transform: none;
+      width: 100%;
+      max-width: 700px;
+      text-align: left;
+      z-index: 3;
+    }
+    #page6 .headline-box-p6 h1 { 
+      font-size: 5rem;
+      font-weight: 900;
+      line-height: 1.3;
+      margin: 0;
+    }
+
+    #page6 .stat-box-p6-bottom {
+      position: absolute;
+      bottom: 80px;
+      left: 80px;
+      transform: none;
+      background-color: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 25px 30px;
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: #e5e5e5;
+      max-width: 500px;
+      text-align: left;
+      margin: 0;
+      z-index: 3;
+    }
+    
+    #page7::before {
+      background-color: rgba(0,0,0,0.4); 
+    }
+
+    #page7 {
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    #page7 h1 { 
+      font-size: 5rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+      line-height: 1.1;
+      z-index: 2;
+    }
+    #page7 h1 span { 
+      color: #a0b0b8; 
+    }
+    
+    #page7 .description-text-p7 { 
+      font-size: 1.5rem;
+      max-width: 600px;
+      line-height: 1.5;
+      color: white;
+      margin: 20px auto 0 auto;
+      padding: 0;
+      z-index: 2;
+    }
+
+    #page7 .content-wrapper {
+        height: auto;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    #page8 .content-wrapper {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    #page8 h3 { 
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: #7c8a99;
+      margin-bottom: 10px;
+    }
+
+    #page8 h1 { 
+      font-size: 4rem;
+      font-weight: 900;
+      line-height: 1.3;
+      margin-bottom: 40px;
+      color: #111;
+    }
+
+    #page8 .image-container-p8 {
+      width: 100%;
+      max-width: 600px;
+      border-radius: 20px;
+      overflow: hidden;
+      margin: 0 auto 40px auto;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    #page8 .image-container-p8 img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    #page8 .description-text-p8 { 
+      font-size: 1.2rem;
+      max-width: 600px;
+      line-height: 1.5;
+      color: #111;
+      margin: 0 auto;
+      padding: 0 20px;
+      box-sizing: border-box;
+    }
+
+    #page9 .headline-box-p9 {
+      position: absolute; 
+      top: 10%;
+      left: 80px;
+      transform: none;
+      width: 100%;
+      max-width: 500px;
+      text-align: left;
+      z-index: 3;
+    }
+    #page9 .headline-box-p9 h3 { 
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #9ccde8;
+      margin-bottom: 10px;
+    }
+    #page9 .headline-box-p9 h1 { 
+      font-size: 5rem;
+      font-weight: 900;
+      line-height: 1.25;
+      margin: 0;
+      color: white;
+    }
+    
+    #page9 .info-box-p9-bottom {
+      position: absolute; 
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: transparent;
+      padding: 0;
+      max-width: 500px;
+      text-align: center;
+      margin: 0;
+      z-index: 3;
+    }
+    
+    #page9 .info-box-p9-bottom .tag {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 999px;
+      margin: 0 6px 8px;
+      font-size: 0.9rem;
+    }
+
+    #page9 .info-box-p9-bottom p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        max-width: none;
+        margin-top: 15px;
+    }
+
+    #page10 {
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    
+    #page10::before {
+        background-color: rgba(0,0,0,0.4);
+    }
+    
+    #page10 h1 { 
+      font-size: 3.5rem;
+      font-weight: 900;
+      line-height: 1.4;
+      margin: 0;
+    }
+
+    #page10 .highlight-no {
+      display: inline-block;
+      font-size: 5rem;
+      font-weight: 900;
+      color: #7ce5f4;
+      margin: 10px 0;
+    }
+
+    #page10 .highlight-yes {
+      display: inline-block;
+      font-size: 5rem;
+      font-weight: 900;
+      color: #7ce5f4;
+      margin: 10px 0;
+    }
+
+    #page10 .content-wrapper {
+        height: auto;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    #page10 { 
+    background-image: url("cn10.jpeg"); 
+    }
+    
+    .content-wrapper { max-width: 100%; padding: 0; width: 100%; }
+  </style>
+</head>
+<body>
+  
+  <section class="overlay" id="page1">
+    <h1>
+      <span class="top">FLEX가</span><br>
+      <span class="bottom">지구를 망쳐요</span>
+    </h1>
+  </section>
+
+  <section class="overlay" id="page2">
+    <div class="headline-box-p2">
+      <h2>MZ세대의 새로운 소비 트렌드,</h2>
+      <h1>플렉스 (flex)</h1>
+      <h2>자신의 재력이나 귀중품을 과시하는 소비 문화.</h2>
+    </div>
+
+    <div class="info-box-p2-bottom">
+      SNS를 통해 <span style="color:#7ce5f4;">명품 소비나 호화로운 경험</span>을 인증하는 방식으로 확산되었다.<br>
+      한국인 명품 지출액은 <span style="color:#7ce5f4;">약 168억 달러(약 21조원)</span>으로,<br>
+      국민들의 경제 수준에 비해 과소비 성향이 높게 나타났다.
+    </div>
+  </section>
+
+  <section class="overlay centered" id="page3">
+    <div class="content-wrapper">
+      <div class="hashtag">
+        <p>#명품소비 #오마카세 등등...</p>
+      </div>
+
+      <h1>
+        과시하는 방식으로 확산
+      </h1>
+
+      <div class="image-frame">
+        <img src="cn3.webp" alt="Dior gift boxes">
+      </div>
+
+      <p>
+        → 정말 필요한 물건을 사는 것보다는 
+        SNS에 자랑하기 우선인<br>
+        <span style="color:#8cbfde;">나를 위한 소비</span>가 아닌
+        <span style="color:#8cbfde;">남을 위한 소비</span>가 점점 심해지고 있다!
+      </p>
+    </div>
+  </section>
+
+  <section class="overlay centered" id="page4">
+    <div class="content-wrapper">
+      <h1>
+        과시소비,
+      </h1>
+      <h2>
+        남보다 나음을 증명하려는 심리<br>⇓<br>베블런 효과와 연결!
+      </h2>
+
+      <div class="image-frame-p4"> 
+        <img src="bbb.jpg" alt="베블런 효과 이미지">
+      </div>
+
+      <div class="quote-box">
+        “상품 가격이 오를수록 수요는 증가한다.<br>
+        왜냐하면 그들은 상품 자체가 아닌<br>
+        <span style='color:#9cd3f4;'>가치를 소비하기 때문</span>이다.”<br><br>
+        — 베블런 (1857–1929)
+      </div>
+    </div>
+  </section>
+
+  <section class="overlay" id="page5"> 
+    <div class="content-wrapper">
+      <h1>
+        결국엔<br>이게 다 쓰레기...
+      </h1>
+
+      <div class="stat-box">
+        우리가 소비하는 옷 대부분은 쓰레기장이나 소각장으로 직행.<br>
+        매년 생산되는 의류 중 재활용되는 비율은 <span style="color:#aee7f9;">1% 미만</span>이다.
+      </div>
+    </div>
+  </section>
+
+  <section class="overlay" id="page6">
+    <div class="headline-box-p6">
+      <h1>
+        점점 무거워지는<br>지구
+      </h1>
+    </div>
+
+    <div class="stat-box-p6-bottom">
+      우리가 소비한 만큼,<br>
+      버려지는 양도 함께 늘고 있다.<br>
+      지난 20여 년간 한국의 폐기물 발생량은<br>
+      <span style="color:#7ce5f4; font-size:1.5rem; font-weight:700;">167%</span>나 증가했다.
+    </div>
+  </section>
+
+  <section class="overlay centered" id="page7"> 
+    <div class="content-wrapper">
+      <h1>남 일 <span>아니고</span>,<br>우리 일인 걸..</h1>
+      
+      <p class="description-text-p7">버려진 물건들에서는 환경은 물론,<br>인체에 해로운 미세플라스틱이 나옴.</p> 
+</div>
+  </section>
+
+  <section class="overlay light-bg" id="page8"> 
+    <div class="content-wrapper">
+      <h3>#혹시.. 당근이세요?</h3>
+
+      <h1>
+        중고거래의 유행
+      </h1>
+      
+      <div class="image-container-p8">
+        <img src="cn8.jpeg" alt="당근마켓 이미지"> 
+      </div>
+
+      <p class="description-text-p8">새로운 것을 사는 것이 아닌, 아껴쓰고 나눠쓰고 다시쓰고!</p>
+    </div>
+  </section>
+
+  <section class="overlay" id="page9"> 
+    <div class="headline-box-p9">
+      <h3>#20만원으로한달살기</h3>
+      <h1>무지출 챌린지</h1>
+    </div>
+    <div class="info-box-p9-bottom">
+      <span class="tag">#배달음식자제하기</span>
+      <span class="tag">#필요한물건만구매</span>
+      <p>
+        소비를 줄이는 작은 실천이<br>환경과 지갑 모두를 가볍게 해요.
+      </p>
+    </div>
+  </section>
+
+  <section class="overlay centered" id="page10">
+    <div class="content-wrapper">
+      <h1>
+        남을 위한 소비?<br>
+        <span class="highlight-no">NO!</span><br>
+        나를 위한 소비?<br>
+        <span class="highlight-yes">YES!</span>
+      </h1>
+    </div>
+  </section>
+
+  <footer>©디지털미디어디자인 24101029 윤동주</footer>
+
+</body>
+</html>
